@@ -1,0 +1,6 @@
+#Ignore All Hidden Files except .gitignore
+.*
+!.gitignore
+
+# Maven target directory
+/target/
