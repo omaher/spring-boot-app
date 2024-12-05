@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven 'maven-3.8.6' // Match the name from Global Tool Configuration
-        docker 'docker' // Match the docker tool name from Tool Configuration
+        docker 'docker-latest' // Match the docker tool name from Tool Configuration
     }
 
     environment {
