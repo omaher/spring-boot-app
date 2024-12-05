@@ -7,8 +7,8 @@ pipeline {
 
     environment {
         // Define environment variables if needed
-        JAVA_HOME = '/path/to/java' // Update this to your Java installation path
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        //JAVA_HOME = '/path/to/java' // Update this to your Java installation path if we want to choose other jdk
+        //PATH = "${JAVA_HOME}/bin:${env.PATH}"
         GIT_REPO = 'https://github.com/omaher/spring-boot-app.git' // Replace with your repository URL
         // Define Docker Hub repository details
         DOCKER_IMAGE = "omaher/spring-boot-app"
