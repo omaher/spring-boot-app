@@ -12,8 +12,11 @@ pipeline {
         //PATH = "${JAVA_HOME}/bin:${env.PATH}"
         GIT_REPO = 'https://github.com/omaher/spring-boot-app.git' // Replace with your repository URL
         // Define Docker Hub repository details
+        DOCKER_TLS_VERIFY = 'false'
+        DOCKER_CERT_PATH = ''
         DOCKER_IMAGE = "omaher/spring-boot-app"
         DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials-id'  // Jenkins credentials ID
+        
     }
 
     parameters {
@@ -70,7 +73,7 @@ pipeline {
                     
                     // Build Docker image with the build number as the tag
                     sh '''
-                    docker build --tlsverify=false -t $dockerTag
+                    docker build -t $dockerTag
                     '''
                 }
             }
