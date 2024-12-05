@@ -13,6 +13,9 @@ pipeline {
         // Define Docker Hub repository details
         DOCKER_IMAGE = "omaher/spring-boot-app"
         DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials-id'  // Jenkins credentials ID
+        //getting certificate issue so ignoring tls request for docker or we can install docker tool
+        DOCKER_TLS_VERIFY = 'false'
+        DOCKER_CERT_PATH = ''
     }
 
     parameters {
