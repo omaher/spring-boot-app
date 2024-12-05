@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'maven-3.8.6' // Match the name from Global Tool Configuration
+    }
+
     environment {
         // Define environment variables if needed
         JAVA_HOME = '/path/to/java' // Update this to your Java installation path
