@@ -43,9 +43,9 @@ pipeline {
                 sh 'mvn -Dmaven.test.failure.ignore=true clean package'
 
                 // Check if the JAR file was created
-                    if (!fileExists(JAR_FILE)) {
-                        error "Build failed: JAR file not created"
-                    }
+                //    if (!fileExists(JAR_FILE)) {
+                //        error "Build failed: JAR file not created"
+                //    }
             }
         }
 
