@@ -69,7 +69,9 @@ pipeline {
                     def dockerTag = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
                     
                     // Build Docker image with the build number as the tag
-                    def customImage = docker.build(dockerTag)
+                    sh '''
+                    docker build --tlsverify=false -t $dockerTag
+                    '''
                 }
             }
         }
