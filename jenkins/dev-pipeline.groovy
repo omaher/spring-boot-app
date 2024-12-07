@@ -12,8 +12,6 @@ pipeline {
         //PATH = "${JAVA_HOME}/bin:${env.PATH}"
         GIT_REPO = 'https://github.com/omaher/spring-boot-app.git' // Replace with your repository URL
         // Define Docker Hub repository details
-        DOCKER_TLS_VERIFY = 'false'
-        DOCKER_CERT_PATH = ''
         DOCKER_IMAGE = "omaher/spring-boot-app"
         DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials-id'  // Jenkins credentials ID
         
@@ -65,24 +63,57 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Setup AWS CLI') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    credentialsId: 'aws_credentials' // Use the ID of your Jenkins credentials
+                ]]) {
+                    sh '''
+                    # Configure AWS CLI with credentials from Jenkins
+                    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                    aws configure set default.region $AWS_REGION
+                    aws configure set output json
+
+                    # Test AWS CLI configuration
+                    aws sts get-caller-identity
+                    '''
+                }
+            }
+        }
+
+         stage('Connect to EC2') {
             steps {
                 script {
-                    // Use Jenkins build number as the Docker tag
-                    def dockerTag = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                    
-                    // Build Docker image with the build number as the tag
-                    def customImage = docker.build(dockerTag)
+                    // Command to SSH into the instance
+                    def sshCommand = """
+                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${USER}@${env.INSTANCE_IP} "echo 'Connected to EC2 instance'; uname -a"
+                    """
+
+                    // Execute the SSH command
+                    sh sshCommand
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                    docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} 
+                    
+                '''
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
-                script {
-                    // Login to Docker Hub using Jenkins credentials
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
-                        // Login is automatically handled by docker.withRegistry
+                // Use Jenkins credentials
+                withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh '''
+                        # Log in to Docker Hub
+                        echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+                    '''
                     }
                 }
             }
@@ -90,10 +121,10 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    // Push the Docker image to Docker Hub with the build number tag
-                    docker.push("${DOCKER_IMAGE}:${BUILD_NUMBER}")
-                }
+                sh '''
+                # Push the Docker image to Docker Hub
+                docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                '''
             }
         }
 
