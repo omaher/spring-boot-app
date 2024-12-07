@@ -154,4 +154,3 @@ pipeline {
             echo 'Build or application start failed.'
         }
     }
-}
