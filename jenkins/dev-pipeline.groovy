@@ -131,7 +131,6 @@ pipeline {
                     }
                 }
             }
-        }
 
         stage('Push Docker Image') {
             steps {
@@ -141,7 +140,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
@@ -154,3 +152,4 @@ pipeline {
             echo 'Build or application start failed.'
         }
     }
+}
