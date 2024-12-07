@@ -83,6 +83,20 @@ pipeline {
             }
         }
 
+        stage('Fetch EC2 Instance Details') {
+            steps {
+                // Fetch the public IP of the EC2 instance
+                script {
+                    env.INSTANCE_IP = sh(
+                        script: "aws ec2 describe-instances --region ${AWS_REGION} --instance-ids ${INSTANCE_ID} --query 'Reservations[*].Instances[*].PublicIpAddress' --output text",
+                        returnStdout: true
+                    ).trim()
+                }
+
+                echo "EC2 Instance IP: ${env.INSTANCE_IP}"
+            }
+        }
+
          stage('Connect to EC2') {
             steps {
                 script {
