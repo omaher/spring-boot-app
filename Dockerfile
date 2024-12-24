@@ -1,10 +1,26 @@
-# Use the official OpenJDK 17 image from Docker Hub
-FROM openjdk:21
-# Set working directory inside the container
+# Stage 1: Build Stage
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
+
+# Set working directory
 WORKDIR /app
-# Copy the compiled Java application JAR file into the container
-COPY ./target/springboot-backend-1.0.0.jar /app
-# Expose the port the Spring Boot application will run on
+
+# Copy pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy source code and build the application
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Runtime Stage
+FROM eclipse-temurin:17-jre
+
+# Set working directory
+WORKDIR /app
+
+# Copy the JAR file from the build stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expose port and set the entrypoint
 EXPOSE 8080
-# Command to run the application
-CMD ["java", "-jar", "springboot-backend-1.0.0.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
