@@ -21,6 +21,9 @@ WORKDIR /app
 # Copy the JAR file from the build stage
 COPY --from=builder /app/target/*.jar app.jar
 
+# Copy the keystore file (make sure to update the path)
+COPY --from=builder /app/src/main/resources/keystore.p12 /app/keystore.p12
+
 # Expose port and set the entrypoint
-EXPOSE 8081
+EXPOSE 8443
 ENTRYPOINT ["java", "-jar", "app.jar"]
